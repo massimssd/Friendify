@@ -1,9 +1,17 @@
 const express = require('express');
 const userController = require('../controllers/users');
-const userRouter = express.Router();
+const postController = require('../controllers/post');
+const authenticateToken = require('../middelware/auth');
+const router = express.Router();
 
-userRouter.get('/users', userController.getAllUsers);
-userRouter.post('/users/login', userController.login);
-userRouter.post('/users', userController.signup);
+router.get('/users', userController.getAllUsers);
+router.post('/users/login', userController.login);
+router.post('/users/signup', userController.signup);
 
-module.exports = userRouter;
+// Utiliser authenticateToken pour protéger cette route
+router.post('/posts', authenticateToken, postController.createPost);
+
+router.get('/posts', postController.getAllPosts);
+router.get('/posts/user/:userId', postController.getPostsByUserId);
+
+module.exports = router;
