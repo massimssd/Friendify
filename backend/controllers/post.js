@@ -3,7 +3,7 @@ const Post = require('../models/post');
 // Créer une nouvelle publication
 const createPost = async (req, res) => {
     const { content } = req.body;
-    const userId = req.user.userId; // récupéré depuis le middleware d'authentification
+    const userId = req.user.userId;
 
     if (!content) {
         return res.status(400).json({ message: 'Le contenu est requis' });
@@ -43,8 +43,35 @@ const getPostsByUserId = async (req, res) => {
     }
 };
 
+const deletePostById = async (req,res)=>{
+    const postId = req.params.postId;
+    try{
+        const deletepost = Post.deletePostById(postId);
+        res.status(200).json(deletepost);
+    }catch (error){
+        console.error('Error while deleting post', error.message);
+        res.sendStatus(500).json({message:'Erreur du serveur'});
+    }
+};
+const updatePost = async (req, res) => {
+    const postId = req.params.postId;
+    const { content } = req.body;
+
+    try {
+        const updatedPost = await Post.updatePostById(postId, content);
+        if (!updatedPost) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        console.error('Error while updating post:', error.message);
+        res.status(500).json({ message: 'Erreur du serveur' });
+    }
+};
 module.exports = {
     createPost,
     getAllPosts,
-    getPostsByUserId
+    getPostsByUserId,
+    deletePostById,
+    updatePost
 };

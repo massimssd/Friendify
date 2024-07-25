@@ -6,7 +6,7 @@ const createPost = async (userId, content) => {
         'INSERT INTO posts (user_id, content) VALUES ($1, $2) RETURNING *',
         [userId, content]
     );
-    return result.rows[0]; // Assurez-vous de renvoyer le résultat
+    return result.rows[0];
 };
 
 // Fonction pour récupérer toutes les publications
@@ -21,8 +21,20 @@ const getPostsByUserId = async (userId) => {
     return result.rows;
 };
 
+const deletePostById = async(postId)=>{
+    await pool.query('DELETE FROM posts WHERE id = $1', [postId]);
+};
+
+const updatePostById = async (postId, newContent) => {
+    const result = await pool.query('UPDATE posts SET content = $2 WHERE id = $1 RETURNING *', [postId, newContent]);
+    return result.rows[0];
+};
+
+
 module.exports = {
     createPost,
     getAllPosts,
-    getPostsByUserId
+    getPostsByUserId,
+    deletePostById,
+    updatePostById
 };
