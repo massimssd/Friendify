@@ -10,10 +10,10 @@ router.post('/users/login', userController.login);
 router.post('/users/signup', userController.signup);
 
 router.post('/posts', authenticateToken, postController.createPost);
-router.delete('/posts/:postId', postController.deletePostById)
+router.put('/posts/:postId',authenticateToken, postController.updatePost);
 router.get('/posts', authenticateToken, postController.getAllPosts);
 router.get('/posts/user/:userId', authenticateToken, postController.getPostsByUserId);
-router.put('/posts/:postId', postController.updatePost);
+router.delete('/posts/:postId', postController.deletePostById);
 
 router.post('/posts/:postId/comments', authenticateToken, commentController.createComment);
 router.get('/comments', authenticateToken ,commentController.getAllComments);

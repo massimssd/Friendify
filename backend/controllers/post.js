@@ -1,25 +1,35 @@
 const Post = require('../models/post');
 
-// Créer une nouvelle publication
 const createPost = async (req, res) => {
-    const { content } = req.body;
+    const { content, image } = req.body;
     const userId = req.user.userId;
 
-    if (!content) {
-        return res.status(400).json({ message: 'Le contenu est requis' });
-    }
-
     try {
-        const newPost = await Post.createPost(userId, content);
+        const newPost = await Post.createPost(userId, content, image);
         res.status(201).json(newPost);
     } catch (error) {
         console.error('Error while creating post:', error.message);
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Erreur du serveur' });
-        }
+        res.status(500).json({ message: 'Erreur du serveur' });
     }
 };
-// Récupérer toutes les publications
+
+
+const updatePost = async (req, res) => {
+    const postId = req.params.postId;
+    const { content, image } = req.body;
+
+    try {
+        const updatedPost = await Post.updatePostById(postId, content, image);
+        if (!updatedPost) {
+            return res.status(404).json({ message: 'Post non trouvé' });
+        }
+        res.status(200).json(updatedPost);
+    } catch (error) {
+        console.error('Error while updating post:', error.message);
+        res.status(500).json({ message: 'Erreur du serveur' });
+    }
+};
+
 const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.getAllPosts();
@@ -30,7 +40,6 @@ const getAllPosts = async (req, res) => {
     }
 };
 
-// Récupérer les publications d'un utilisateur spécifique
 const getPostsByUserId = async (req, res) => {
     const userId = req.params.userId;
 
@@ -43,35 +52,22 @@ const getPostsByUserId = async (req, res) => {
     }
 };
 
-const deletePostById = async (req,res)=>{
+const deletePostById = async (req, res) => {
     const postId = req.params.postId;
-    try{
-        const deletepost = Post.deletePostById(postId);
-        res.status(200).json(deletepost);
-    }catch (error){
-        console.error('Error while deleting post', error.message);
-        res.sendStatus(500).json({message:'Erreur du serveur'});
-    }
-};
-const updatePost = async (req, res) => {
-    const postId = req.params.postId;
-    const { content } = req.body;
 
     try {
-        const updatedPost = await Post.updatePostById(postId, content);
-        if (!updatedPost) {
-            return res.status(404).json({ message: 'Post not found' });
-        }
-        res.status(200).json(updatedPost);
+        await Post.deletePostById(postId);
+        res.status(200).json({ message: 'Post supprimé avec succès' });
     } catch (error) {
-        console.error('Error while updating post:', error.message);
+        console.error('Error while deleting post:', error.message);
         res.status(500).json({ message: 'Erreur du serveur' });
     }
 };
+
 module.exports = {
     createPost,
+    updatePost,
     getAllPosts,
     getPostsByUserId,
-    deletePostById,
-    updatePost
+    deletePostById
 };
