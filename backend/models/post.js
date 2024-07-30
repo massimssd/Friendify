@@ -9,10 +9,16 @@ const createPost = async (userId, text, image) => {
     return result.rows[0];
 };
 
+// Fonction pour récupérer tous les posts avec les noms des utilisateurs
 const getAllPosts = async () => {
-    const result = await pool.query('SELECT * FROM posts');
+    const result = await pool.query(`
+        SELECT posts.*, users.username
+        FROM posts
+        JOIN users ON posts.user_id = users.id
+    `);
     return result.rows;
 };
+
 
 const getPostsByUserId = async (userId) => {
     const result = await pool.query('SELECT * FROM posts WHERE user_id = $1', [userId]);
