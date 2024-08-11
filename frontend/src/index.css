@@ -1,0 +1,6 @@
+/* src/App.css */
+
+.main-content {
+    padding-top: 60px; /* Height of the header */
+    padding-bottom: 60px; /* Height of the footer */
+}

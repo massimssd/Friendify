@@ -13,7 +13,7 @@ router.post('/posts', authenticateToken, postController.createPost);
 router.put('/posts/:postId',authenticateToken, postController.updatePost);
 router.get('/posts', authenticateToken, postController.getAllPosts);
 router.get('/posts/user/:userId', authenticateToken, postController.getPostsByUserId);
-router.delete('/posts/:postId', postController.deletePostById);
+router.delete('/posts/:postId',authenticateToken, postController.deletePostById);
 
 router.post('/posts/:postId/comments', authenticateToken, commentController.createComment);
 router.get('/comments', authenticateToken ,commentController.getAllComments);

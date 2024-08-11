@@ -1,20 +1,26 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import PostItem from '../pages/upPost';
 import './PostList.css';
 
 const PostList = () => {
     const [posts, setPosts] = useState([]);
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:4000/posts', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                setPosts(response.data);
+                const storedUserId = localStorage.getItem('userId');
+                if (token) {
+                    setUserId(storedUserId);
+                    const response = await axios.get('http://localhost:4000/posts', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    setPosts(response.data);
+                }
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }
@@ -23,32 +29,53 @@ const PostList = () => {
         fetchPosts();
     }, []);
 
+    const handleDelete = async (postId) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (token) {
+                await axios.delete(`http://localhost:4000/posts/${postId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                setPosts(posts.filter(post => post.id !== postId));
+            }
+        } catch (error) {
+            console.error('Error deleting post:', error);
+        }
+    };
+
+    const handleUpdate = async (updatedPost) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (token) {
+                const response = await axios.put(`http://localhost:4000/posts/${updatedPost.id}`, updatedPost, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                setPosts(posts.map(post => (post.id === response.data.id ? response.data : post)));
+            }
+        } catch (error) {
+            console.error('Error updating post:', error);
+        }
+    };
+
     return (
         <div className="post-list">
-            {posts.map((post) => (
-                <div key={post.id} className="post-item">
-                    <header>
-                        <img src="https://via.placeholder.com/40" alt="User Avatar" />
-                        <h2>{post.username}</h2>
-                    </header>
-                    <div className="post-content">
-                        <p>{post.content}</p>
-                    </div>
-                    {post.image && (
-                        <div className="post-image">
-                            <img src={post.image} alt="Post" />
-                        </div>
-                    )}
-                    <footer>
-                        <div className="icons">
-                            <i className="fas fa-heart"></i>
-                            <i className="fas fa-comment"></i>
-                            <i className="fas fa-share"></i>
-                        </div>
-                        <div className="likes">100 likes</div>
-                    </footer>
-                </div>
-            ))}
+            {posts.length > 0 ? (
+                posts.map((post) => (
+                    <PostItem
+                        key={post.id}
+                        post={post}
+                        onDelete={handleDelete}
+                        onUpdate={handleUpdate}
+                        userId={userId}
+                    />
+                ))
+            ) : (
+                <p>No posts available</p>
+            )}
         </div>
     );
 };

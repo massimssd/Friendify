@@ -12,7 +12,12 @@ const Login = ({ onLogin }) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:4000/users/login', { email, password });
-            const token = response.data.token;
+            const { token, userId } = response.data;
+
+            // Stocker le token et l'ID utilisateur dans le localStorage
+            localStorage.setItem('token', token);
+            localStorage.setItem('userId', userId);
+
             onLogin(token);
             navigate('/');
         } catch (error) {

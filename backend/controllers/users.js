@@ -52,12 +52,13 @@ const login = async (req, res) => {
         }
 
         const token = generateToken(user.id);
-        res.status(200).json({ token, user });
+        res.status(200).json({ token, userId: user.id });
     } catch (error) {
         console.error('Error while logging in:', error.message);
         res.status(500).json({ message: 'Erreur du serveur' });
     }
 };
+
 
 module.exports = {
     getAllUsers,

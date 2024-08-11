@@ -16,13 +16,20 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
     const postId = req.params.postId;
+    const userId = req.user.userId;
     const { content, image } = req.body;
 
     try {
-        const updatedPost = await Post.updatePostById(postId, content, image);
-        if (!updatedPost) {
+        const post = await Post.getPostById(postId);
+        if (!post) {
             return res.status(404).json({ message: 'Post non trouvé' });
         }
+
+        if (post.user_id !== userId) {
+            return res.status(403).json({ message: 'Accès interdit' });
+        }
+
+        const updatedPost = await Post.updatePostById(postId, content, image);
         res.status(200).json(updatedPost);
     } catch (error) {
         console.error('Error while updating post:', error.message);
@@ -54,8 +61,18 @@ const getPostsByUserId = async (req, res) => {
 
 const deletePostById = async (req, res) => {
     const postId = req.params.postId;
+    const userId = req.user.userId;
 
     try {
+        const post = await Post.getPostById(postId);
+        if (!post) {
+            return res.status(404).json({ message: 'Post non trouvé' });
+        }
+
+        if (post.user_id !== userId) {
+            return res.status(403).json({ message: 'Accès interdit' });
+        }
+
         await Post.deletePostById(postId);
         res.status(200).json({ message: 'Post supprimé avec succès' });
     } catch (error) {
@@ -63,7 +80,6 @@ const deletePostById = async (req, res) => {
         res.status(500).json({ message: 'Erreur du serveur' });
     }
 };
-
 module.exports = {
     createPost,
     updatePost,

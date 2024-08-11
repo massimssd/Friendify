@@ -19,6 +19,10 @@ const getAllPosts = async () => {
     return result.rows;
 };
 
+const getPostById = async (postId) => {
+    const result = await pool.query('SELECT * FROM posts WHERE id = $1', [postId]);
+    return result.rows[0];
+};
 
 const getPostsByUserId = async (userId) => {
     const result = await pool.query('SELECT * FROM posts WHERE user_id = $1', [userId]);
@@ -38,5 +42,6 @@ module.exports = {
     getAllPosts,
     getPostsByUserId,
     deletePostById,
-    updatePostById
+    updatePostById,
+    getPostById
 };
